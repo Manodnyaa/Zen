@@ -119,6 +119,7 @@ const Login = () => {
   return (
     <Container component="main" maxWidth="xs">
       <Box
+        className="zen-page-shell"
         sx={{
           minHeight: '100vh',
           display: 'flex',
@@ -128,6 +129,9 @@ const Login = () => {
           py: 4
         }}
       >
+        <div className="zen-page-dotgrid" />
+        <div className="zen-page-blob zen-page-blob--one" />
+        <div className="zen-page-blob zen-page-blob--two" />
         <Paper
           component={motion.div}
           initial={{ opacity: 0, y: 20 }}
@@ -162,7 +166,7 @@ const Login = () => {
             <LockIcon sx={{ color: 'white', fontSize: 32 }} />
           </Box>
           
-          <Typography component="h1" variant="h5" gutterBottom>
+          <Typography component="h1" variant="h5" gutterBottom className="zen-page-title">
             Sign in to MindfulMe
           </Typography>
           

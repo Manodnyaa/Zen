@@ -28,7 +28,9 @@ const chatbotRoutes = require('./routes/chatbotRoutes');
 // Use API routes FIRST
 app.use('/api/users', userRoutes);
 app.use('/api/journal', journalRoutes);
+app.use('/api/journals', journalRoutes);
 app.use('/api/mood', moodRoutes);
+app.use('/api/moods', moodRoutes);
 app.use('/api/chatbot', chatbotRoutes);
 
 // Serve static assets ONLY after API routes

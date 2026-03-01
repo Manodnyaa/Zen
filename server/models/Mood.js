@@ -5,7 +5,7 @@ const MoodSchema = new mongoose.Schema({
     type: Number,
     required: [true, 'Please add a mood rating'],
     min: [1, 'Mood rating must be at least 1'],
-    max: [5, 'Mood rating cannot be more than 5']
+    max: [10, 'Mood rating cannot be more than 10']
   },
   notes: {
     type: String,

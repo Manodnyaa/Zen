@@ -29,6 +29,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { format, parseISO } from 'date-fns';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
+import { NotebookPen } from 'lucide-react';
 
 const JournalDetail = () => {
   const { darkMode } = useTheme();
@@ -57,11 +58,11 @@ const JournalDetail = () => {
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/journals/${id}`, {
+      const response = await axios.get(`/api/journal/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      setEntry(response.data);
+      setEntry(response.data?.data || null);
       
     } catch (error) {
       console.error('Error fetching journal entry:', error);
@@ -81,7 +82,7 @@ const JournalDetail = () => {
         return;
       }
       
-      await axios.delete(`http://localhost:5000/api/journals/${id}`, {
+      await axios.delete(`/api/journal/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -127,7 +128,7 @@ const JournalDetail = () => {
           <IconButton onClick={() => navigate('/journal')} sx={{ mr: 2 }}>
             <BackIcon />
           </IconButton>
-          <Typography variant="h4">Journal Entry Not Found</Typography>
+          <Typography variant="h4" className="zen-feature-title">Journal Entry Not Found</Typography>
         </Box>
         
         <Paper 
@@ -151,7 +152,7 @@ const JournalDetail = () => {
             variant="contained"
             color="primary"
             onClick={() => navigate('/journal')}
-            sx={{ mt: 2, borderRadius: 8, px: 3 }}
+            sx={{ mt: 2, px: 3 }}
           >
             Back to Journal
           </Button>
@@ -179,7 +180,10 @@ const JournalDetail = () => {
           <IconButton onClick={() => navigate('/journal')} sx={{ mr: 2 }}>
             <BackIcon />
           </IconButton>
-          <Typography variant="h4">Journal Entry</Typography>
+          <Box>
+            <Chip icon={<NotebookPen size={16} />} label="Reflection Detail" size="small" sx={{ mb: 1 }} />
+            <Typography variant="h4" className="zen-feature-title">Journal Entry</Typography>
+          </Box>
         </Box>
         <Box>
           <Button
@@ -187,7 +191,7 @@ const JournalDetail = () => {
             color="primary"
             startIcon={<EditIcon />}
             onClick={() => navigate(`/journal/edit/${id}`)}
-            sx={{ mr: 2, borderRadius: 8 }}
+            sx={{ mr: 2 }}
           >
             Edit
           </Button>
@@ -196,7 +200,6 @@ const JournalDetail = () => {
             color="error"
             startIcon={<DeleteIcon />}
             onClick={() => setDeleteDialogOpen(true)}
-            sx={{ borderRadius: 8 }}
           >
             Delete
           </Button>
@@ -210,7 +213,7 @@ const JournalDetail = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
+        <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
           <CardContent sx={{ p: 4 }}>
             {/* Entry Header */}
             <Box sx={{ mb: 3 }}>
@@ -271,8 +274,8 @@ const JournalDetail = () => {
                       size="small" 
                       icon={<TagIcon fontSize="small" />}
                       sx={{ 
-                        bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(106, 90, 205, 0.1)',
-                        color: darkMode ? '#8a79f0' : '#6a5acd'
+                        bgcolor: darkMode ? 'rgba(155, 145, 232, 0.14)' : 'rgba(124, 111, 224, 0.10)',
+                        color: darkMode ? '#C7BFFF' : '#5A4ABF'
                       }} 
                     />
                   ))}
@@ -285,15 +288,15 @@ const JournalDetail = () => {
         {/* Mood Card */}
         {entry.mood && (
           <Card 
+            className="zen-feature-card"
             elevation={3} 
             sx={{ 
               borderRadius: 3, 
               overflow: 'hidden',
               mb: 3,
-              background: darkMode 
-                ? 'linear-gradient(45deg, #6a5acd 30%, #8a79f0 90%)'
-                : 'linear-gradient(45deg, #6a5acd 30%, #8a79f0 90%)',
-              color: 'white'
+              background: darkMode ? 'rgba(124,111,224,0.22)' : 'rgba(124,111,224,0.14)',
+              border: '1px solid rgba(124,111,224,0.20)',
+              color: 'text.primary'
             }}
           >
             <CardContent sx={{ p: 3 }}>
@@ -331,7 +334,6 @@ const JournalDetail = () => {
             variant="outlined"
             startIcon={<BackIcon />}
             onClick={() => navigate('/journal')}
-            sx={{ borderRadius: 8 }}
           >
             Back to Journal
           </Button>
@@ -341,7 +343,6 @@ const JournalDetail = () => {
             color="primary"
             startIcon={<EditIcon />}
             onClick={() => navigate(`/journal/edit/${id}`)}
-            sx={{ borderRadius: 8 }}
           >
             Edit Entry
           </Button>

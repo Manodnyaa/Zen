@@ -11,16 +11,15 @@ import {
   Slider,
   IconButton,
   InputAdornment,
-  Tooltip,
   CircularProgress,
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions
+  DialogActions,
+  Alert
 } from '@mui/material';
 import { 
   Save as SaveIcon,
-  Delete as DeleteIcon,
   ArrowBack as BackIcon,
   Add as AddIcon,
   Favorite as HeartIcon,
@@ -32,6 +31,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import axios from 'axios';
 import { format } from 'date-fns';
 import { useTheme } from '../context/ThemeContext';
+import { NotebookPen } from 'lucide-react';
 
 const JournalForm = ({ isEditing = false }) => {
   const { darkMode } = useTheme();
@@ -48,6 +48,7 @@ const JournalForm = ({ isEditing = false }) => {
   const [tagDialogOpen, setTagDialogOpen] = useState(false);
   const [discardDialogOpen, setDiscardDialogOpen] = useState(false);
   const [formChanged, setFormChanged] = useState(false);
+  const [saveError, setSaveError] = useState('');
   
   // Fetch journal entry if editing
   useEffect(() => {
@@ -76,11 +77,11 @@ const JournalForm = ({ isEditing = false }) => {
         return;
       }
       
-      const response = await axios.get(`http://localhost:5000/api/journals/${id}`, {
+      const response = await axios.get(`/api/journal/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
-      const entry = response.data;
+      const entry = response.data?.data || response.data;
       
       setTitle(entry.title || '');
       setContent(entry.content || '');
@@ -97,40 +98,51 @@ const JournalForm = ({ isEditing = false }) => {
   
   // Save journal entry
   const saveJournalEntry = async () => {
+    if (!content.trim()) {
+      setSaveError('Please write something in your journal entry before saving.');
+      return;
+    }
+
     try {
       setSaving(true);
+      setSaveError('');
       
       // Get token from localStorage
       const token = localStorage.getItem('token');
       
       if (!token) {
-        console.error('No auth token found');
+        setSaveError('Your session has expired. Please login again.');
         return;
       }
       
+      const fallbackTitle = `Journal Entry - ${format(new Date(), 'MMMM d, yyyy')}`;
       const entryData = {
-        title: title.trim() || null,
-        content,
+        // Backend requires title; use generated title when user leaves it blank.
+        title: title.trim() || fallbackTitle,
+        content: content.trim(),
         mood,
-        tags
+        tags: tags.filter(Boolean)
       };
       
-      let response;
-      
       if (isEditing) {
-        response = await axios.put(`http://localhost:5000/api/journals/${id}`, entryData, {
+        await axios.put(`/api/journal/${id}`, entryData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       } else {
-        response = await axios.post('http://localhost:5000/api/journals', entryData, {
+        await axios.post('/api/journal', entryData, {
           headers: { Authorization: `Bearer ${token}` }
         });
       }
       
+      setFormChanged(false);
       navigate('/journal');
       
     } catch (error) {
       console.error('Error saving journal entry:', error);
+      setSaveError(
+        error.response?.data?.message ||
+        'Unable to save your entry right now. Please try again.'
+      );
     } finally {
       setSaving(false);
     }
@@ -215,9 +227,12 @@ const JournalForm = ({ isEditing = false }) => {
           >
             <BackIcon />
           </IconButton>
-          <Typography variant="h4">
-            {isEditing ? 'Edit Journal Entry' : 'New Journal Entry'}
-          </Typography>
+          <Box>
+            <Chip icon={<NotebookPen size={16} />} label={isEditing ? 'Update Reflection' : 'Fresh Reflection'} size="small" sx={{ mb: 1 }} />
+            <Typography variant="h4" className="zen-feature-title">
+              {isEditing ? 'Edit Journal Entry' : 'New Journal Entry'}
+            </Typography>
+          </Box>
         </Box>
         <Button
           variant="contained"
@@ -225,11 +240,17 @@ const JournalForm = ({ isEditing = false }) => {
           startIcon={<SaveIcon />}
           onClick={saveJournalEntry}
           disabled={saving || !content.trim()}
-          sx={{ borderRadius: 8, px: 3 }}
+          sx={{ px: 3 }}
         >
           {saving ? 'Saving...' : 'Save'}
         </Button>
       </Box>
+
+      {saveError && (
+        <Alert severity="error" sx={{ mb: 3 }}>
+          {saveError}
+        </Alert>
+      )}
       
       {/* Form */}
       <Grid 
@@ -241,7 +262,7 @@ const JournalForm = ({ isEditing = false }) => {
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <Grid item xs={12} md={8}>
-          <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
+          <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
             <CardContent sx={{ p: 3 }}>
               <TextField
                 fullWidth
@@ -289,7 +310,7 @@ const JournalForm = ({ isEditing = false }) => {
         </Grid>
         
         <Grid item xs={12} md={4}>
-          <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
+          <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', mb: 3 }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 How are you feeling today?
@@ -329,12 +350,12 @@ const JournalForm = ({ isEditing = false }) => {
                   mt: 3, 
                   p: 2, 
                   borderRadius: 2, 
-                  bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(106, 90, 205, 0.1)',
+                  bgcolor: darkMode ? 'rgba(155, 145, 232, 0.16)' : 'rgba(124, 111, 224, 0.10)',
                   display: 'flex',
                   alignItems: 'center'
                 }}
               >
-                <HeartIcon sx={{ mr: 2, color: darkMode ? '#8a79f0' : '#6a5acd' }} />
+                <HeartIcon sx={{ mr: 2, color: darkMode ? '#C7BFFF' : '#5A4ABF' }} />
                 <Typography>
                   You're feeling <strong>{getMoodLabel(mood)}</strong> today
                 </Typography>
@@ -342,26 +363,26 @@ const JournalForm = ({ isEditing = false }) => {
             </CardContent>
           </Card>
           
-          <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
+          <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h6" gutterBottom>
                 Journal Tips
               </Typography>
               
               <Typography variant="body2" paragraph>
-                • Write freely without worrying about grammar or spelling
+                - Write freely without worrying about grammar or spelling
               </Typography>
               
               <Typography variant="body2" paragraph>
-                • Reflect on both positive and challenging experiences
+                - Reflect on both positive and challenging experiences
               </Typography>
               
               <Typography variant="body2" paragraph>
-                • Consider what you're grateful for today
+                - Consider what you're grateful for today
               </Typography>
               
               <Typography variant="body2">
-                • Use tags to organize your entries and track patterns
+                - Use tags to organize your entries and track patterns
               </Typography>
             </CardContent>
           </Card>

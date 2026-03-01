@@ -32,7 +32,7 @@ exports.getJournal = async (req, res, next) => {
     }
     
     // Make sure user owns the journal entry
-    if (journal.user.toString() !== req.user.id) {
+    if (!journal.user || journal.user.toString() !== req.user.id) {
       return res.status(401).json({
         success: false,
         message: 'Not authorized to access this journal entry'
@@ -82,7 +82,7 @@ exports.updateJournal = async (req, res, next) => {
     }
     
     // Make sure user owns the journal entry
-    if (journal.user.toString() !== req.user.id) {
+    if (!journal.user || journal.user.toString() !== req.user.id) {
       return res.status(401).json({
         success: false,
         message: 'Not authorized to update this journal entry'
@@ -118,14 +118,14 @@ exports.deleteJournal = async (req, res, next) => {
     }
     
     // Make sure user owns the journal entry
-    if (journal.user.toString() !== req.user.id) {
+    if (!journal.user || journal.user.toString() !== req.user.id) {
       return res.status(401).json({
         success: false,
         message: 'Not authorized to delete this journal entry'
       });
     }
     
-    await journal.remove();
+    await Journal.deleteOne({ _id: req.params.id });
     
     res.status(200).json({
       success: true,

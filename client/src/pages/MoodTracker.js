@@ -10,6 +10,7 @@ import {
   CircularProgress,
   Paper,
   IconButton,
+  Chip,
   Tooltip,
   Divider,
   Dialog,
@@ -29,6 +30,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { format, parseISO, subDays, isToday, isYesterday } from 'date-fns';
 import axios from 'axios';
 import { useTheme } from '../context/ThemeContext';
+import { Activity } from 'lucide-react';
 import { Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -99,12 +101,12 @@ const MoodTracker = () => {
         return;
       }
       
-      const response = await axios.get('http://localhost:5000/api/moods', {
+      const response = await axios.get('/api/mood', {
         headers: { Authorization: `Bearer ${token}` }
       });
       
       // Sort entries by date (newest first)
-      const sortedEntries = response.data.sort((a, b) => 
+      const sortedEntries = (response.data?.data || []).sort((a, b) => 
         new Date(b.createdAt) - new Date(a.createdAt)
       );
       
@@ -135,11 +137,11 @@ const MoodTracker = () => {
       }
       
       const moodData = {
-        value: selectedMood,
+        mood: selectedMood,
         notes: notes.trim() || null
       };
       
-      await axios.post('http://localhost:5000/api/moods', moodData, {
+      await axios.post('/api/mood', moodData, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -168,7 +170,7 @@ const MoodTracker = () => {
         return;
       }
       
-      await axios.delete(`http://localhost:5000/api/moods/${entryToDelete._id}`, {
+      await axios.delete(`/api/mood/${entryToDelete._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -241,10 +243,10 @@ const MoodTracker = () => {
     
     // Map mood values to dates
     const moodValues = dates.map(date => {
-      const matchingMood = moodEntries.find(mood => 
-        format(parseISO(mood.createdAt), 'MMM dd') === date
+      const matchingMood = moodEntries.find(entry => 
+        format(parseISO(entry.createdAt), 'MMM dd') === date
       );
-      return matchingMood ? matchingMood.value : null;
+      return matchingMood ? (matchingMood.mood ?? matchingMood.value ?? null) : null;
     });
     
     return {
@@ -256,10 +258,10 @@ const MoodTracker = () => {
           fill: true,
           backgroundColor: darkMode 
             ? 'rgba(138, 121, 240, 0.2)' 
-            : 'rgba(106, 90, 205, 0.2)',
-          borderColor: darkMode ? '#8a79f0' : '#6a5acd',
+            : 'rgba(124, 111, 224, 0.2)',
+          borderColor: darkMode ? '#8a79f0' : '#7C6FE0',
           tension: 0.4,
-          pointBackgroundColor: darkMode ? '#8a79f0' : '#6a5acd',
+          pointBackgroundColor: darkMode ? '#8a79f0' : '#7C6FE0',
           pointRadius: 4,
           pointHoverRadius: 6
         }
@@ -314,7 +316,7 @@ const MoodTracker = () => {
   const calculateAverageMood = () => {
     if (moodEntries.length === 0) return 0;
     
-    const sum = moodEntries.reduce((total, entry) => total + entry.value, 0);
+    const sum = moodEntries.reduce((total, entry) => total + (entry.mood ?? entry.value ?? 0), 0);
     return Math.round((sum / moodEntries.length) * 10) / 10;
   };
   
@@ -322,10 +324,10 @@ const MoodTracker = () => {
   const calculateMoodTrend = () => {
     if (moodEntries.length < 3) return 'Not enough data';
     
-    const recentMoods = moodEntries.slice(0, 3).map(entry => entry.value);
+    const recentMoods = moodEntries.slice(0, 3).map(entry => (entry.mood ?? entry.value ?? 0));
     const avgRecent = recentMoods.reduce((a, b) => a + b, 0) / recentMoods.length;
     
-    const olderMoods = moodEntries.slice(3, 6).map(entry => entry.value);
+    const olderMoods = moodEntries.slice(3, 6).map(entry => (entry.mood ?? entry.value ?? 0));
     if (olderMoods.length === 0) return 'Not enough data';
     
     const avgOlder = olderMoods.reduce((a, b) => a + b, 0) / olderMoods.length;
@@ -358,7 +360,10 @@ const MoodTracker = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Typography variant="h4">Mood Tracker</Typography>
+        <Box>
+          <Chip icon={<Activity size={16} />} label="Emotional Check-in" size="small" sx={{ mb: 1 }} />
+          <Typography variant="h4" className="zen-feature-title">Mood Tracker</Typography>
+        </Box>
         <IconButton onClick={() => setInfoDialogOpen(true)}>
           <InfoIcon />
         </IconButton>
@@ -374,7 +379,7 @@ const MoodTracker = () => {
         transition={{ duration: 0.5, delay: 0.1 }}
       >
         <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', height: '100%' }}>
+          <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Typography variant="h5" gutterBottom>
                 How are you feeling today?
@@ -396,10 +401,10 @@ const MoodTracker = () => {
                             p: 1,
                             borderRadius: '50%',
                             bgcolor: selectedMood === mood.value 
-                              ? (darkMode ? 'rgba(138, 121, 240, 0.3)' : 'rgba(106, 90, 205, 0.2)')
+                              ? (darkMode ? 'rgba(138, 121, 240, 0.3)' : 'rgba(124, 111, 224, 0.2)')
                               : 'transparent',
                             border: selectedMood === mood.value 
-                              ? `2px solid ${darkMode ? '#8a79f0' : '#6a5acd'}`
+                              ? `2px solid ${darkMode ? '#8a79f0' : '#7C6FE0'}`
                               : '2px solid transparent',
                             transition: 'all 0.2s ease'
                           }}
@@ -432,7 +437,7 @@ const MoodTracker = () => {
                 startIcon={<SaveIcon />}
                 onClick={saveMoodEntry}
                 disabled={saving || !selectedMood}
-                sx={{ borderRadius: 8, py: 1.5 }}
+                sx={{ py: 1.5 }}
               >
                 {saving ? 'Saving...' : 'Save Mood'}
               </Button>
@@ -441,7 +446,7 @@ const MoodTracker = () => {
         </Grid>
         
         <Grid item xs={12} md={6}>
-          <Card elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', height: '100%' }}>
+          <Card className="zen-feature-card" elevation={3} sx={{ borderRadius: 3, overflow: 'hidden', height: '100%' }}>
             <CardContent sx={{ p: 3 }}>
               <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
                 <Typography variant="h5">Mood Overview</Typography>
@@ -450,7 +455,7 @@ const MoodTracker = () => {
                     size="small"
                     variant={timeframe === 'week' ? 'contained' : 'outlined'}
                     onClick={() => handleTimeframeChange('week')}
-                    sx={{ mr: 1, borderRadius: 8 }}
+                    sx={{ mr: 1 }}
                   >
                     Week
                   </Button>
@@ -458,7 +463,7 @@ const MoodTracker = () => {
                     size="small"
                     variant={timeframe === 'month' ? 'contained' : 'outlined'}
                     onClick={() => handleTimeframeChange('month')}
-                    sx={{ mr: 1, borderRadius: 8 }}
+                    sx={{ mr: 1 }}
                   >
                     Month
                   </Button>
@@ -466,7 +471,6 @@ const MoodTracker = () => {
                     size="small"
                     variant={timeframe === 'year' ? 'contained' : 'outlined'}
                     onClick={() => handleTimeframeChange('year')}
-                    sx={{ borderRadius: 8 }}
                   >
                     Year
                   </Button>
@@ -505,7 +509,7 @@ const MoodTracker = () => {
                     sx={{ 
                       p: 2, 
                       borderRadius: 2, 
-                      bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(106, 90, 205, 0.1)',
+                      bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(124, 111, 224, 0.1)',
                       height: '100%'
                     }}
                   >
@@ -529,7 +533,7 @@ const MoodTracker = () => {
                     sx={{ 
                       p: 2, 
                       borderRadius: 2, 
-                      bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(106, 90, 205, 0.1)',
+                      bgcolor: darkMode ? 'rgba(138, 121, 240, 0.1)' : 'rgba(124, 111, 224, 0.1)',
                       height: '100%'
                     }}
                   >
@@ -566,6 +570,7 @@ const MoodTracker = () => {
       
       {/* Recent Entries */}
       <Card 
+        className="zen-feature-card"
         elevation={3} 
         sx={{ borderRadius: 3, overflow: 'hidden', mt: 3 }}
         component={motion.div}
@@ -595,10 +600,10 @@ const MoodTracker = () => {
                       <Box>
                         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
                           <Typography variant="h5" sx={{ mr: 2 }}>
-                            {moodOptions.find(m => m.value === entry.value)?.emoji || '😐'}
+                            {moodOptions.find(m => m.value === (entry.mood ?? entry.value))?.emoji || '😐'}
                           </Typography>
                           <Typography variant="subtitle1">
-                            {moodOptions.find(m => m.value === entry.value)?.label || 'Unknown'} ({entry.value}/10)
+                            {moodOptions.find(m => m.value === (entry.mood ?? entry.value))?.label || 'Unknown'} ({entry.mood ?? entry.value}/10)
                           </Typography>
                         </Box>
                         
@@ -654,11 +659,10 @@ const MoodTracker = () => {
           
           {moodEntries.length > 5 && (
             <Box sx={{ mt: 2, textAlign: 'center' }}>
-              <Button
-                variant="outlined"
-                startIcon={<HistoryIcon />}
-                sx={{ borderRadius: 8 }}
-              >
+                <Button
+                  variant="outlined"
+                  startIcon={<HistoryIcon />}
+                >
                 View All Entries
               </Button>
             </Box>

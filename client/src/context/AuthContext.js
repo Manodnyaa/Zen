@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useCallback } from 'react';
+import React, { createContext, useState, useContext, useCallback, useEffect } from 'react';
 import axios from 'axios';
 
 const AuthContext = createContext();
@@ -11,10 +11,13 @@ export const AuthProvider = ({ children }) => {
   const [error, setError] = useState(null);
 
   // Register user
-  const register = async (userData) => {
+  const register = async (userDataOrName, emailArg, passwordArg) => {
     setLoading(true);
     setError(null);
     try {
+      const userData = typeof userDataOrName === 'object'
+        ? userDataOrName
+        : { name: userDataOrName, email: emailArg, password: passwordArg };
       const res = await axios.post('/api/users/register', userData);
       
       if (res.data.success) {
@@ -32,10 +35,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   // Login user
-  const login = async (userData) => {
+  const login = async (userDataOrEmail, passwordArg) => {
     setLoading(true);
     setError(null);
     try {
+      const userData = typeof userDataOrEmail === 'object'
+        ? userDataOrEmail
+        : { email: userDataOrEmail, password: passwordArg };
       const res = await axios.post('/api/users/login', userData);
       
       if (res.data.success) {
@@ -96,6 +102,10 @@ export const AuthProvider = ({ children }) => {
     }
     setLoading(false);
   }, []);
+
+  useEffect(() => {
+    checkUserLoggedIn();
+  }, [checkUserLoggedIn]);
 
   return (
     <AuthContext.Provider

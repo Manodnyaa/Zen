@@ -21,6 +21,7 @@ const NotFound = () => {
   return (
     <Container maxWidth="md">
       <Box
+        className="zen-page-shell"
         sx={{
           minHeight: '100vh',
           display: 'flex',
@@ -30,6 +31,9 @@ const NotFound = () => {
           py: 4
         }}
       >
+        <div className="zen-page-dotgrid" />
+        <div className="zen-page-blob zen-page-blob--one" />
+        <div className="zen-page-blob zen-page-blob--two" />
         <Paper
           component={motion.div}
           initial={{ opacity: 0, y: 20 }}
@@ -59,7 +63,7 @@ const NotFound = () => {
             <SadIcon 
               sx={{ 
                 fontSize: 120, 
-                color: darkMode ? 'rgba(138, 121, 240, 0.7)' : 'rgba(106, 90, 205, 0.7)',
+                color: darkMode ? 'rgba(155, 145, 232, 0.75)' : 'rgba(124, 111, 224, 0.72)',
                 mb: 2
               }} 
             />
@@ -74,13 +78,7 @@ const NotFound = () => {
             sx={{ 
               fontWeight: 700, 
               fontSize: { xs: '4rem', md: '6rem' },
-              background: darkMode 
-                ? 'linear-gradient(45deg, #6a5acd 30%, #8a79f0 90%)'
-                : 'linear-gradient(45deg, #6a5acd 30%, #8a79f0 90%)',
-              backgroundClip: 'text',
-              textFillColor: 'transparent',
-              WebkitBackgroundClip: 'text',
-              WebkitTextFillColor: 'transparent',
+              color: darkMode ? '#9B91E8' : '#5A4ABF',
               mb: 2
             }}
           >
@@ -94,6 +92,7 @@ const NotFound = () => {
             animate={{ opacity: 1 }}
             transition={{ duration: 0.5, delay: 0.4 }}
             gutterBottom
+            className="zen-page-title"
           >
             Page Not Found
           </Typography>

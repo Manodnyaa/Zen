@@ -282,7 +282,7 @@ exports.deleteMood = async (req, res, next) => {
       });
     }
     
-    await mood.remove();
+    await mood.deleteOne();
     
     res.status(200).json({
       success: true,

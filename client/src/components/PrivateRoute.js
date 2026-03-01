@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate } from 'react-router-dom';
+import { Navigate, Outlet } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Loader from './Loader';
 
@@ -10,7 +10,11 @@ const PrivateRoute = ({ children }) => {
     return <Loader />;
   }
 
-  return user ? children : <Navigate to="/login" />;
+  if (!user) {
+    return <Navigate to="/login" />;
+  }
+
+  return children || <Outlet />;
 };
 
 export default PrivateRoute; 
