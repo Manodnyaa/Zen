@@ -25,11 +25,7 @@ The project is organized into two main directories:
 
 ## Team
 
-- Vaishnav Kedar
 - Pratik Shinde
-- Vaishnavi Kharat
-- Rihan Shaikh
-- Sarvesh Salunkhe
 - Manodnya Medhe
 
 ## Getting Started
