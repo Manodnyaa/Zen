@@ -22,6 +22,7 @@ import Chatbot from './pages/Chatbot';
 import BreathingExercise from './pages/BreathingExercise';
 import NotFound from './pages/NotFound';
 import LandingPage from './pages/LandingPage';
+import ContactPage from './pages/ContactPage';
 
 const App = () => {
   return (
@@ -270,6 +271,7 @@ const AppContent = () => {
               <Route path="/mood" element={<MoodTracker />} />
               <Route path="/chatbot" element={<Chatbot />} />
               <Route path="/breathing" element={<BreathingExercise />} />
+              <Route path="/contact" element={<ContactPage />} />
             </Route>
 
             {/* fallback */}

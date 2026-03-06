@@ -24,12 +24,14 @@ const LandingNavbar = () => {
         { label: "Features", href: "#features" },
         { label: "About", href: "#about" },
         { label: "Team", href: "#team" },
+        { label: "Contact Us", to: "/contact"}
       ]
     : [
         { label: "Journal", to: "/journal" },
         { label: "Mood", to: "/mood" },
         { label: "Chatbot", to: "/chatbot" },
         { label: "Breathing", to: "/breathing" },
+        
       ];
 
   const handleLogout = async () => {

@@ -21,6 +21,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
-    "concurrently": "^7.6.0"
+    "concurrently": "^7.6.0",
+    "express-rate-limit": "^8.3.0"
   }
-} 
+}
