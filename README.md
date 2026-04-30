@@ -26,6 +26,7 @@ The project is organized into two main directories:
 ## Team
 
 - Pratik Shinde
+- Vaishnav Kedar
 - Manodnya Medhe
 
 ## Getting Started
@@ -38,30 +39,31 @@ The project is organized into two main directories:
 ### Installation
 
 1. Clone the repository
+
    ```bash
    git clone https://github.com/yourusername/zen-wellness-app.git
    cd zen-wellness-app
    ```
-
 2. Install server dependencies
+
    ```bash
    cd server
    npm install
    ```
-
 3. Install client dependencies
+
    ```bash
    cd ../client
    npm install
    ```
-
 4. Start the server
+
    ```bash
    cd ../server
    npm start
    ```
-
 5. Access the application
+
    - Open your browser and navigate to: `http://localhost:5001`
 
 ## License
@@ -71,4 +73,4 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 ## Acknowledgments
 
 - All team members who contributed to this project
-- Mental health resources and research that informed our approach 
+- Mental health resources and research that informed our approach
