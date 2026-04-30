@@ -24,6 +24,12 @@ const team = [
     bio: "Passionate about building accessible, human-centred digital experiences.",
     avatar: "",
   },
+  {
+    name: "Vaishnavi Kharat",
+    role: "Full-Stack Developer",
+    bio: "Passionate about building accessible, human-centred digital experiences.",
+    avatar: "",
+  },
 ];
 
 const TeamCard = ({ name, role, bio, avatar }) => (
